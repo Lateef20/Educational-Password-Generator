@@ -7,13 +7,21 @@ import (
 	"unicode"
 )
 
+var specialSet = map[rune]bool{}
+
+func init() {
+	for _, r := range "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" {
+		specialSet[r] = true
+	}
+}
+
 func main() {
 	input := "www.google.com"
 	result := BitEntropy(input)
 	fmt.Printf("Entropy of '%s' is: %d", input, result)
 }
 
-// Arbitrary bit entropy classification
+// BitEntropy Arbitrary bit entropy classification
 // < 70 bits: Weak
 // 70-100+ bits: Acceptable
 // 100+ bits: Strong
@@ -34,7 +42,8 @@ func BitEntropy(value string) (bits int) {
 			hasLower = true
 		case unicode.IsDigit(r):
 			hasDigit = true
-		default:
+		}
+		if specialSet[r] {
 			hasSymbol = true
 		}
 	}
@@ -49,9 +58,9 @@ func BitEntropy(value string) (bits int) {
 		totalCharacterSet += 9
 	}
 	if hasSymbol {
-		totalCharacterSet += 23
+		totalCharacterSet += 32
 	}
-	//23 assumption, some older  sites  prohibit certain special characters or spaces due to improper data handling practices.
+	//32 assumption, some older  sites  prohibit certain special characters or spaces due to improper data handling practices.
 
 	//H≈Lxlog2(R)
 	return int(float64(len(value)) * math.Log2(float64(totalCharacterSet)))
